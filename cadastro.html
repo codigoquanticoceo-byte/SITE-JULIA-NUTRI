@@ -1,0 +1,477 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Júlia Clementino Nutricionista - Cadastro</title>
+
+<style>
+:root {
+  --laranja: #F28C28;
+  --preto: #1D1D1D;
+  --branco: #FFFFFF;
+  --vinho: #E0006C;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(to right, var(--laranja), var(--branco) 55%);
+  min-height: 100vh;
+}
+
+/* BARRA SUPERIOR */
+.top-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 16px 40px;
+}
+
+.cta-button {
+  text-decoration: none;
+  padding: 10px 28px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--branco);
+  background-color: var(--preto);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+}
+
+/* MENU SUPERIOR */
+.menu-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.menu {
+  display: inline-flex;
+  align-items: center;
+  gap: 22px;
+  background-color: var(--preto);
+  padding: 10px 16px;
+  border-radius: 40px;
+  position: relative;
+}
+
+.menu a {
+  text-decoration: none;
+  color: var(--branco);
+  font-size: 15px;
+  padding: 10px 18px;
+  border-radius: 30px;
+  transition: 0.3s;
+  white-space: nowrap;
+}
+
+.menu a:hover {
+  background-color: var(--laranja);
+}
+
+/* CARRINHO */
+.cart-btn {
+  margin-left: 4px;
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: linear-gradient(145deg, #2a2a2a, #111);
+  border: 1px solid rgba(255,255,255,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.cart-icon { width: 22px; height: 22px; }
+
+.cart-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  background: var(--vinho);
+  color: var(--branco);
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-gear {
+  position: absolute;
+  right: -34px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: var(--laranja);
+  background: transparent;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.admin-gear:hover {
+  transform: translateY(-50%) rotate(90deg);
+  color: var(--vinho);
+}
+
+/* LOGO */
+.top-logo {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.top-logo img {
+  width: 180px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  border: 4px solid var(--laranja);
+}
+
+/* QUADRO */
+.quadro {
+  width: 70%;
+  max-width: 900px;
+  background-color: var(--preto);
+  margin: 50px auto;
+  padding: 40px;
+  border-radius: 30px;
+  color: var(--branco);
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.35);
+  text-align: left;
+}
+
+.quadro h2 {
+  margin-top: 0;
+  color: var(--laranja);
+  font-size: 28px;
+}
+
+.quadro p {
+  font-size: 16px;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.92);
+}
+
+/* FORM */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field label {
+  font-size: 14px;
+  color: rgba(255,255,255,0.92);
+}
+
+.input {
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: #2a2a2a;
+  color: var(--branco);
+  padding: 0 14px;
+  outline: none;
+}
+
+.input:focus {
+  border-color: rgba(242, 140, 40, 0.9);
+  box-shadow: 0 0 0 3px rgba(242, 140, 40, 0.15);
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.92);
+}
+
+.checkbox input {
+  width: 18px;
+  height: 18px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 22px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: bold;
+  border: 0;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.btn-primary {
+  background-color: var(--laranja);
+  color: var(--preto);
+}
+
+.btn-primary:hover {
+  background-color: var(--vinho);
+  color: var(--branco);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--branco);
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+.btn-outline:hover {
+  border-color: rgba(255,255,255,0.6);
+}
+
+.message {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #2a2a2a;
+  border: 1px solid rgba(255,255,255,0.12);
+  display: none;
+}
+
+.message.ok {
+  border-color: rgba(242, 140, 40, 0.65);
+}
+
+.message.err {
+  border-color: rgba(224, 0, 108, 0.65);
+}
+
+.message strong {
+  color: var(--laranja);
+}
+
+@media (max-width: 780px) {
+  .quadro { width: 86%; padding: 26px; }
+  .form-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="top-bar">
+  <a href="conheca.html" class="cta-button">Conheça meu trabalho</a>
+</div>
+
+<div class="top-logo">
+  <img src="logo-arte.png" alt="Logo Júlia Clementino Nutricionista">
+</div>
+
+<div class="menu-container">
+  <nav class="menu">
+    <a href="index.html">PLANILHAS PROFISSIONAIS</a>
+    <a href="gestao-uan.html">GESTÃO UAN</a>
+    <a href="treinamento-manipulacao.html">TREINAMENTO DE MANIPULAÇÃO</a>
+    <a href="cadastro.html">CADASTRO</a>
+    <a href="login.html">LOGIN</a>
+
+    <button class="cart-btn" id="cartBtn" aria-label="Carrinho">
+      <svg class="cart-icon" viewBox="0 0 24 24" fill="none">
+        <path d="M3 4h2l2.2 9.2a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
+              stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="10" cy="20" r="1.4" fill="#FFFFFF"/>
+        <circle cx="18" cy="20" r="1.4" fill="#FFFFFF"/>
+      </svg>
+      <span class="cart-count" id="cartCount">0</span>
+    </button>
+
+    <a href="admin.html" id="adminBtn" class="admin-gear" title="Painel Administrativo" aria-label="Admin">⚙</a>
+  </nav>
+</div>
+
+<div class="quadro">
+  <h2>Cadastro</h2>
+  <p>Crie sua conta para facilitar compras e acesso aos seus materiais.</p>
+
+  <form id="cadastroForm" novalidate>
+    <div class="form-grid">
+      <div class="field">
+        <label for="nome">Nome completo</label>
+        <input class="input" id="nome" name="nome" type="text" placeholder="Digite seu nome" autocomplete="name" />
+      </div>
+
+      <div class="field">
+        <label for="telefone">Telefone</label>
+        <input class="input" id="telefone" name="telefone" type="tel" placeholder="(00) 00000-0000" autocomplete="tel" />
+      </div>
+
+      <div class="field full">
+        <label for="email">Email</label>
+        <input class="input" id="email" name="email" type="email" placeholder="seuemail@exemplo.com" autocomplete="email" />
+      </div>
+
+      <div class="field">
+        <label for="senha">Senha</label>
+        <input class="input" id="senha" name="senha" type="password" placeholder="Crie uma senha" autocomplete="new-password" />
+      </div>
+
+      <div class="field">
+        <label for="confirmarSenha">Confirmar senha</label>
+        <input class="input" id="confirmarSenha" name="confirmarSenha" type="password" placeholder="Repita a senha" autocomplete="new-password" />
+      </div>
+
+      <div class="field full">
+        <label class="checkbox">
+          <input type="checkbox" id="termos" />
+          Aceito os termos e condições
+        </label>
+      </div>
+    </div>
+
+    <div class="row">
+      <button class="btn btn-primary" type="submit">Cadastrar</button>
+
+      <!-- ✅ BOTÃO PARA IR AO LOGIN (NOVO) -->
+      <a class="btn btn-outline" href="login.html">Já tenho conta / Login</a>
+
+      <a class="btn btn-outline" href="index.html">Voltar</a>
+    </div>
+
+    <div class="message ok" id="msgOk">
+      <strong>Cadastro realizado.</strong> Seus dados foram salvos neste navegador.
+    </div>
+
+    <div class="message err" id="msgErr"></div>
+  </form>
+</div>
+
+<script src="/assets/js/cart.js"></script>
+<script>
+document.getElementById("cartBtn").addEventListener("click", function () {
+  window.location.href = "carrinho.html";
+});
+
+const usuarioLogado = "admin";
+const adminBtn = document.getElementById("adminBtn");
+if (adminBtn && usuarioLogado === "admin") {
+  adminBtn.style.display = "flex";
+}
+
+/* =========================
+   Cadastro + ligação melhor com Login
+   - userCadastro: dados cadastrados
+   - userSession: sessão simples (para o login usar)
+========================= */
+const USER_KEY = "userCadastro";
+const SESSION_KEY = "userSession";
+
+function showError(text) {
+  const el = document.getElementById("msgErr");
+  el.classList.add("err");
+  el.style.display = "block";
+  el.textContent = text;
+
+  const ok = document.getElementById("msgOk");
+  ok.style.display = "none";
+}
+
+function showOk() {
+  const ok = document.getElementById("msgOk");
+  ok.classList.add("ok");
+  ok.style.display = "block";
+
+  const el = document.getElementById("msgErr");
+  el.style.display = "none";
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || "").trim());
+}
+
+function setSessionFromUser(user) {
+  // sessão simples para o login reconhecer rapidamente
+  const payload = {
+    email: user.email,
+    nome: user.nome,
+    loggedAt: new Date().toISOString()
+  };
+  localStorage.setItem(SESSION_KEY, JSON.stringify(payload));
+}
+
+document.getElementById("cadastroForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  const nome = document.getElementById("nome").value.trim();
+  const telefone = document.getElementById("telefone").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const senha = document.getElementById("senha").value;
+  const confirmarSenha = document.getElementById("confirmarSenha").value;
+  const termos = document.getElementById("termos").checked;
+
+  if (!nome) return showError("Informe seu nome completo.");
+  if (!telefone) return showError("Informe seu telefone.");
+  if (!email || !isValidEmail(email)) return showError("Informe um email válido.");
+  if (!senha || senha.length < 6) return showError("A senha deve ter pelo menos 6 caracteres.");
+  if (senha !== confirmarSenha) return showError("As senhas não conferem.");
+  if (!termos) return showError("Você precisa aceitar os termos e condições.");
+
+  const user = {
+    nome,
+    telefone,
+    email,
+    // Observação: armazenar senha assim não é seguro para um site real (aqui é apenas para teste local).
+    senha,
+    createdAt: new Date().toISOString()
+  };
+
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+
+  // ✅ melhora: cria sessão após cadastro (ajuda o fluxo com a página de login)
+  setSessionFromUser(user);
+
+  showOk();
+
+  // ✅ melhora: ir direto ao login após cadastrar
+  window.location.href = "login.html";
+
+  // opcional: limpar campos
+  // this.reset();
+});
+</script>
+
+</body>
+</html>
+
+
