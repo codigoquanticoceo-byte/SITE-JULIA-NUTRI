@@ -179,6 +179,36 @@ body {
   color: rgba(255,255,255,0.9);
 }
 
+/* CONTADOR DE VISITAS */
+.visit-counter-strip {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 18px;
+    padding: 0 20px;
+}
+
+.visit-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: rgba(29, 29, 29, 0.9);
+    color: var(--branco);
+    font-size: 14px;
+    line-height: 1.4;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.visit-counter__value {
+    font-weight: bold;
+    font-size: 17px;
+    letter-spacing: 0.04em;
+    color: var(--laranja);
+}
+
+
 @media (max-width: 768px) {
   .top-bar {
     justify-content: center;
@@ -279,6 +309,7 @@ body {
     </div>
   </section>
   <script src="/assets/js/cart.js"></script>
+<script src="/assets/js/visit-counter.js"></script>
   <script>
   document.getElementById("cartBtn").addEventListener("click", function () {
     window.location.href = "carrinho.html";
@@ -292,3 +323,4 @@ body {
   </script>
 </body>
 </html>
+

@@ -157,6 +157,36 @@ body {
   border: 4px solid var(--laranja);
 }
 
+/* CONTADOR DE VISITAS */
+.visit-counter-strip {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 18px;
+    padding: 0 20px;
+}
+
+.visit-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: rgba(29, 29, 29, 0.9);
+    color: var(--branco);
+    font-size: 14px;
+    line-height: 1.4;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.visit-counter__value {
+    font-weight: bold;
+    font-size: 17px;
+    letter-spacing: 0.04em;
+    color: var(--laranja);
+}
+
+
 @media (max-width: 768px) {
   .top-bar {
     justify-content: center;
@@ -371,6 +401,12 @@ body {
     <a href="admin.html" id="adminBtn" class="admin-gear" title="Painel Administrativo" aria-label="Admin">⚙</a>
   </nav>
 </div>
+<div class="visit-counter-strip">
+    <div class="visit-counter" aria-live="polite">
+        <span class="visit-counter__label">Visitas registradas:</span>
+        <span class="visit-counter__value" id="visitCountDisplay">carregando...</span>
+    </div>
+</div>
 
 <div class="quadro">
   <h2>Cadastro</h2>
@@ -429,6 +465,7 @@ body {
 </div>
 
 <script src="/assets/js/cart.js"></script>
+<script src="/assets/js/visit-counter.js"></script>
 <script>
 document.getElementById("cartBtn").addEventListener("click", function () {
   window.location.href = "carrinho.html";
@@ -524,5 +561,6 @@ document.getElementById("cadastroForm").addEventListener("submit", function (e) 
 
 </body>
 </html>
+
 
 
