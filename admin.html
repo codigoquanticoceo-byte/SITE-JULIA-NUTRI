@@ -12,6 +12,15 @@
   --vinho: #E0006C;
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -53,6 +62,8 @@ body {
 .menu {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 22px;
   background-color: var(--preto);
   padding: 10px 16px;
@@ -166,6 +177,37 @@ body {
 .card p {
   line-height: 1.6;
   color: rgba(255,255,255,0.9);
+}
+
+@media (max-width: 768px) {
+  .top-bar {
+    justify-content: center;
+    padding: 12px 20px;
+  }
+
+  .menu-container {
+    margin-top: 14px;
+    padding: 0 12px;
+  }
+
+  .menu {
+    gap: 12px;
+    padding: 12px 18px;
+  }
+
+  .menu a {
+    font-size: 14px;
+    padding: 8px 14px;
+  }
+
+  .top-logo img {
+    width: 120px;
+  }
+
+  .card {
+    width: 92%;
+    padding: 28px 20px;
+  }
 }
 
 .actions {

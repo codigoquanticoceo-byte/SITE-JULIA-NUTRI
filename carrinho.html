@@ -13,6 +13,15 @@
   --vinho: #E0006C;
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -54,6 +63,8 @@ body {
 .menu {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 22px;
   background-color: var(--preto);
   padding: 10px 16px;
@@ -144,6 +155,52 @@ body {
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.25);
   border: 4px solid var(--laranja);
+}
+
+@media (max-width: 768px) {
+  .top-bar {
+    justify-content: center;
+    padding: 12px 20px;
+  }
+
+  .menu-container {
+    margin-top: 14px;
+    padding: 0 12px;
+  }
+
+  .menu {
+    gap: 12px;
+    padding: 12px 18px;
+  }
+
+  .menu a {
+    font-size: 14px;
+    padding: 8px 14px;
+  }
+
+  .top-logo img {
+    width: 140px;
+  }
+
+  .quadro {
+    width: 92%;
+    padding: 28px 20px;
+  }
+
+  .cart-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cart-actions {
+    width: 100%;
+  }
+
+  .cart-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
 }
 
 /* QUADRO PRINCIPAL */
