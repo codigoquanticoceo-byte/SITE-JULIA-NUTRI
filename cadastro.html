@@ -47,87 +47,99 @@ body {
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--branco);
-  background-color: var(--preto);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
-}
+  <script>
+  document.getElementById("cartBtn").addEventListener("click", function () {
+    window.location.href = "carrinho.html";
+  });
 
-/* MENU SUPERIOR */
-.menu-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
+  const supabaseGetter = () => window.supabaseClient;
+  const isAdminEmail = (email) => window.Auth?.isAdminEmail?.(email) || false;
 
-.menu {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 22px;
-  background-color: var(--preto);
-  padding: 10px 16px;
-  border-radius: 40px;
-  position: relative;
-}
+  function showError(text) {
+    const el = document.getElementById("msgErr");
+    el.style.display = "block";
+    el.textContent = text;
 
-.menu a {
-  text-decoration: none;
-  color: var(--branco);
-  font-size: 15px;
-  padding: 10px 18px;
-  border-radius: 30px;
-  transition: 0.3s;
-  white-space: nowrap;
-}
+    const ok = document.getElementById("msgOk");
+    ok.style.display = "none";
+  }
 
-.menu a:hover {
-  background-color: var(--laranja);
-}
+  function showOk(messageHtml) {
+    const ok = document.getElementById("msgOk");
+    ok.style.display = "block";
+    ok.innerHTML = messageHtml || "<strong>Cadastro realizado.</strong> Verifique seu email.";
 
-/* CARRINHO */
-.cart-btn {
-  margin-left: 4px;
-  position: relative;
-  width: 44px;
-  height: 44px;
-  border-radius: 999px;
-  background: linear-gradient(145deg, #2a2a2a, #111);
-  border: 1px solid rgba(255,255,255,0.25);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
+    const el = document.getElementById("msgErr");
+    el.style.display = "none";
+  }
 
-.cart-icon { width: 22px; height: 22px; }
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || "").trim());
+  }
 
-.cart-count {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  min-width: 20px;
-  height: 20px;
-  background: var(--vinho);
-  color: var(--branco);
-  font-size: 12px;
-  font-weight: bold;
-  border-radius: 999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  const cadastroForm = document.getElementById("cadastroForm");
+  const submitBtn = cadastroForm.querySelector("button[type='submit']");
+  const defaultSubmitText = submitBtn.textContent;
 
-.admin-gear {
-  position: absolute;
-  right: -34px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 20px;
-  height: 20px;
-  display: none;
-  align-items: center;
+  const setLoading = (isLoading) => {
+    submitBtn.disabled = isLoading;
+    submitBtn.textContent = isLoading ? "Cadastrando..." : defaultSubmitText;
+  };
+
+  cadastroForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const supabase = supabaseGetter();
+    if (!supabase) {
+      return showError("Supabase não configurado. Atualize a página e tente novamente.");
+    }
+
+    const nome = document.getElementById("nome").value.trim();
+    const telefone = document.getElementById("telefone").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const senha = document.getElementById("senha").value;
+    const confirmarSenha = document.getElementById("confirmarSenha").value;
+    const termos = document.getElementById("termos").checked;
+
+    if (!nome) return showError("Informe seu nome completo.");
+    if (!telefone) return showError("Informe seu telefone.");
+    if (!email || !isValidEmail(email)) return showError("Informe um email válido.");
+    if (!senha || senha.length < 6) return showError("A senha deve ter pelo menos 6 caracteres.");
+    if (senha !== confirmarSenha) return showError("As senhas não conferem.");
+    if (!termos) return showError("Você precisa aceitar os termos e condições.");
+
+    setLoading(true);
+    try {
+      const isAdmin = isAdminEmail(email);
+      const { error } = await supabase.auth.signUp({
+        email,
+        password: senha,
+        options: {
+          data: {
+            nome,
+            telefone,
+            is_admin: isAdmin
+          }
+        }
+      });
+
+      if (error) {
+        return showError(error.message || "Não foi possível concluir o cadastro.");
+      }
+
+      const adminNote = isAdmin ? " Você receberá acesso administrativo assim que confirmar o e-mail." : "";
+      showOk(`<strong>Cadastro realizado.</strong> Verifique seu email para confirmar a conta.${adminNote}`);
+
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 1800);
+    } catch (error) {
+      showError("Erro inesperado ao cadastrar. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  });
+  </script>
   justify-content: center;
   font-size: 16px;
   color: var(--laranja);
@@ -464,30 +476,21 @@ body {
   </form>
 </div>
 
-<script src="/assets/js/cart.js"></script>
-<script src="/assets/js/visit-counter.js"></script>
+<script src="./assets/js/cart.js"></script>
+<script src="./assets/js/visit-counter.js"></script>
+<script src="./assets/js/config.js"></script>
+<script type="module" src="./assets/js/supabase-client.js"></script>
+<script src="./assets/js/auth.js"></script>
 <script>
 document.getElementById("cartBtn").addEventListener("click", function () {
   window.location.href = "carrinho.html";
 });
 
-const usuarioLogado = "admin";
-const adminBtn = document.getElementById("adminBtn");
-if (adminBtn && usuarioLogado === "admin") {
-  adminBtn.style.display = "flex";
-}
-
-/* =========================
-   Cadastro + ligação melhor com Login
-   - userCadastro: dados cadastrados
-   - userSession: sessão simples (para o login usar)
-========================= */
-const USER_KEY = "userCadastro";
-const SESSION_KEY = "userSession";
+const supabaseGetter = () => window.supabaseClient;
+const isAdminEmail = (email) => window.Auth?.isAdminEmail?.(email) || false;
 
 function showError(text) {
   const el = document.getElementById("msgErr");
-  el.classList.add("err");
   el.style.display = "block";
   el.textContent = text;
 
@@ -495,10 +498,10 @@ function showError(text) {
   ok.style.display = "none";
 }
 
-function showOk() {
+function showOk(messageHtml) {
   const ok = document.getElementById("msgOk");
-  ok.classList.add("ok");
   ok.style.display = "block";
+  ok.innerHTML = messageHtml || "<strong>Cadastro realizado.</strong> Verifique seu email.";
 
   const el = document.getElementById("msgErr");
   el.style.display = "none";
@@ -508,18 +511,22 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || "").trim());
 }
 
-function setSessionFromUser(user) {
-  // sessão simples para o login reconhecer rapidamente
-  const payload = {
-    email: user.email,
-    nome: user.nome,
-    loggedAt: new Date().toISOString()
-  };
-  localStorage.setItem(SESSION_KEY, JSON.stringify(payload));
-}
+const cadastroForm = document.getElementById("cadastroForm");
+const submitBtn = cadastroForm.querySelector("button[type='submit']");
+const defaultSubmitText = submitBtn.textContent;
 
-document.getElementById("cadastroForm").addEventListener("submit", function (e) {
+const setLoading = (isLoading) => {
+  submitBtn.disabled = isLoading;
+  submitBtn.textContent = isLoading ? "Cadastrando..." : defaultSubmitText;
+};
+
+cadastroForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  const supabase = supabaseGetter();
+  if (!supabase) {
+    return showError("Supabase não configurado. Atualize a página e tente novamente.");
+  }
 
   const nome = document.getElementById("nome").value.trim();
   const telefone = document.getElementById("telefone").value.trim();
@@ -535,27 +542,36 @@ document.getElementById("cadastroForm").addEventListener("submit", function (e) 
   if (senha !== confirmarSenha) return showError("As senhas não conferem.");
   if (!termos) return showError("Você precisa aceitar os termos e condições.");
 
-  const user = {
-    nome,
-    telefone,
-    email,
-    // Observação: armazenar senha assim não é seguro para um site real (aqui é apenas para teste local).
-    senha,
-    createdAt: new Date().toISOString()
-  };
+  setLoading(true);
+  try {
+    const isAdmin = isAdminEmail(email);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password: senha,
+      options: {
+        data: {
+          nome,
+          telefone,
+          is_admin: isAdmin
+        }
+      }
+    });
 
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
+    if (error) {
+      return showError(error.message || "Não foi possível concluir o cadastro.");
+    }
 
-  // ✅ melhora: cria sessão após cadastro (ajuda o fluxo com a página de login)
-  setSessionFromUser(user);
+    const adminNote = isAdmin ? " Você receberá acesso administrativo assim que confirmar o e-mail." : "";
+    showOk(`<strong>Cadastro realizado.</strong> Verifique seu email para confirmar a conta.${adminNote}`);
 
-  showOk();
-
-  // ✅ melhora: ir direto ao login após cadastrar
-  window.location.href = "login.html";
-
-  // opcional: limpar campos
-  // this.reset();
+    setTimeout(() => {
+      window.location.href = "login.html";
+    }, 1800);
+  } catch (error) {
+    showError("Erro inesperado ao cadastrar. Tente novamente.");
+  } finally {
+    setLoading(false);
+  }
 });
 </script>
 

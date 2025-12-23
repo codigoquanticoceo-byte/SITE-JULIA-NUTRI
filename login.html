@@ -428,30 +428,23 @@ body {
   </form>
 </div>
 
-<script src="/assets/js/cart.js"></script>
-<script src="/assets/js/visit-counter.js"></script>
+<script src="./assets/js/cart.js"></script>
+<script src="./assets/js/visit-counter.js"></script>
+<script src="./assets/js/config.js"></script>
+<script type="module" src="./assets/js/supabase-client.js"></script>
+<script src="./assets/js/auth.js"></script>
 <script>
 document.getElementById("cartBtn").addEventListener("click", function () {
   window.location.href = "carrinho.html";
 });
 
-const usuarioLogado = "admin";
-const adminBtn = document.getElementById("adminBtn");
-if (adminBtn && usuarioLogado === "admin") {
-  adminBtn.style.display = "flex";
-}
-
-/* =========================
-   LOGIN (interligado ao cadastro)
-========================= */
-const USER_KEY = "userCadastro";   // mesma chave do cadastro.html
-const SESSION_KEY = "userSession"; // sessão simples
+const supabaseGetter = () => window.supabaseClient;
+const authHelper = window.Auth;
 
 function $(id) { return document.getElementById(id); }
 
 function showError(text) {
   const el = $("msgErr");
-  el.classList.add("err");
   el.style.display = "block";
   el.textContent = text;
 
@@ -462,7 +455,6 @@ function showError(text) {
 
 function showOk(htmlText) {
   const ok = $("msgOk");
-  ok.classList.add("ok");
   ok.style.display = "block";
   ok.innerHTML = htmlText;
 
@@ -475,64 +467,62 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || "").trim());
 }
 
-function readUserCadastro() {
-  try {
-    const raw = localStorage.getItem(USER_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
+const loginForm = $("loginForm");
+const submitBtn = loginForm.querySelector("button[type='submit']");
+const signOutBtn = $("btnSair");
+const submitDefaultText = submitBtn.textContent;
+
+const setLoading = (isLoading) => {
+  submitBtn.disabled = isLoading;
+  submitBtn.textContent = isLoading ? "Entrando..." : submitDefaultText;
+};
+
+const waitForSession = async () => {
+  if (authHelper?.ready) {
+    await authHelper.ready();
   }
-}
+  return authHelper?.getSession?.() || null;
+};
 
-function readSession() {
-  try {
-    const raw = localStorage.getItem(SESSION_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-function setSession(user) {
-  const payload = {
-    email: user.email,
-    nome: user.nome,
-    loggedAt: new Date().toISOString()
-  };
-  localStorage.setItem(SESSION_KEY, JSON.stringify(payload));
-  return payload;
-}
-
-function clearSession() {
-  localStorage.removeItem(SESSION_KEY);
-}
-
-function refreshUI() {
-  const session = readSession();
-  const btnSair = $("btnSair");
-
-  if (session && session.email) {
-    btnSair.style.display = "inline-block";
-    showOk(`<strong>Você já está logado.</strong> Olá, ${session.nome || "usuário"}.
-            <br/>Você pode ir para <strong>Planilhas Profissionais</strong> ou continuar navegando.`);
+const refreshUI = async () => {
+  const session = await waitForSession();
+  if (session?.email) {
+    signOutBtn.style.display = "inline-block";
+    showOk(`<strong>Você já está logado.</strong> Olá, ${session.nome || session.email}.`);
   } else {
-    btnSair.style.display = "none";
+    signOutBtn.style.display = "none";
     $("msgOk").style.display = "none";
     $("msgOk").textContent = "";
   }
-}
+};
 
-$("btnSair").addEventListener("click", function () {
-  clearSession();
-  showOk(`<strong>Você saiu.</strong> Login encerrado com sucesso.`);
-  // limpa campos por conveniência
-  $("emailLogin").value = "";
-  $("senhaLogin").value = "";
+authHelper?.onSessionChange?.(() => {
   refreshUI();
 });
 
-$("loginForm").addEventListener("submit", function (e) {
-  e.preventDefault();
+signOutBtn.addEventListener("click", async () => {
+  const supabase = supabaseGetter();
+  if (!supabase) {
+    showError("Supabase não configurado. Atualize a página e tente novamente.");
+    return;
+  }
+  try {
+    await authHelper?.signOut?.();
+    showOk(`<strong>Você saiu.</strong> Login encerrado com sucesso.`);
+    $("emailLogin").value = "";
+    $("senhaLogin").value = "";
+  } catch (error) {
+    showError("Não foi possível encerrar a sessão. Tente novamente.");
+  }
+});
+
+loginForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const supabase = supabaseGetter();
+  if (!supabase) {
+    return showError("Supabase não configurado. Atualize a página e tente novamente.");
+  }
 
   const email = $("emailLogin").value.trim();
   const senha = $("senhaLogin").value;
@@ -540,29 +530,18 @@ $("loginForm").addEventListener("submit", function (e) {
   if (!email || !isValidEmail(email)) return showError("Informe um email válido.");
   if (!senha) return showError("Informe sua senha.");
 
-  const user = readUserCadastro();
-
-  if (!user) {
-    return showError("Nenhum cadastro encontrado neste navegador. Clique em 'Criar conta' e faça seu cadastro.");
+  setLoading(true);
+  try {
+    const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
+    if (error) {
+      return showError(error.message || "Não foi possível realizar o login.");
+    }
+    showOk(`<strong>Login realizado.</strong> Bem-vindo(a)!`);
+  } catch (error) {
+    showError("Erro inesperado ao tentar conectar. Tente novamente.");
+  } finally {
+    setLoading(false);
   }
-
-  const emailSaved = String(user.email || "").trim().toLowerCase();
-  const emailTyped = email.toLowerCase();
-
-  if (emailTyped !== emailSaved) {
-    return showError("Email não encontrado. Verifique ou crie uma conta em 'Criar conta'.");
-  }
-
-  if (senha !== user.senha) {
-    return showError("Senha incorreta. Tente novamente.");
-  }
-
-  const session = setSession(user);
-  showOk(`<strong>Login realizado.</strong> Bem-vindo(a), ${session.nome || "usuário"}!`);
-  refreshUI();
-
-  // opcional: redirecionar após login
-  // window.location.href = "index.html";
 });
 
 refreshUI();

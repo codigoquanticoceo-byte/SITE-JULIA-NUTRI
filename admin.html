@@ -420,6 +420,10 @@ body {
   pointer-events: none;
 }
 
+.toast--error {
+  background-color: var(--vinho);
+}
+
 .toast--visible {
   opacity: 1;
   transform: translateY(0);
@@ -641,24 +645,35 @@ body {
     </div>
   </section>
   <div class="toast" id="adminToast" role="status" aria-live="polite"></div>
+  <script src="./assets/js/config.js"></script>
+  <script type="module" src="./assets/js/supabase-client.js"></script>
   <script src="./assets/js/site-data.js"></script>
   <script src="./assets/js/cart.js"></script>
   <script src="./assets/js/visit-counter.js"></script>
+  <script src="./assets/js/auth.js"></script>
   <script>
   document.getElementById("cartBtn").addEventListener("click", function () {
     window.location.href = "carrinho.html";
   });
 
-  const usuarioLogado = "admin";
-  const adminBtn = document.getElementById("adminBtn");
-  if (adminBtn && usuarioLogado === "admin") {
-    adminBtn.style.display = "flex";
-  }
-
-  (function () {
+  (async function () {
     if (!window.SiteData) {
       console.warn("SiteData não foi carregado.");
       return;
+    }
+    if (window.Auth?.ready) {
+      await window.Auth.ready();
+    }
+
+    const session = window.Auth?.getSession?.();
+    if (!session?.isAdmin) {
+      alert("Acesso restrito. Faça login com uma conta de administrador.");
+      window.location.href = "login.html";
+      return;
+    }
+
+    if (window.SiteData?.ready) {
+      await window.SiteData.ready();
     }
 
     const heroForm = document.getElementById("heroForm");
@@ -679,6 +694,7 @@ body {
     const clearProductFormBtn = document.getElementById("clearProductFormBtn");
 
     const toast = document.getElementById("adminToast");
+    let toastTimeout = null;
 
     let editingProductId = null;
 
@@ -700,15 +716,33 @@ body {
       return numeric.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     };
 
-    const showToast = (message) => {
+    const showToast = (message, isError = false) => {
       if (!toast) {
         return;
       }
       toast.textContent = message;
+      toast.classList.toggle("toast--error", Boolean(isError));
       toast.classList.add("toast--visible");
-      setTimeout(() => {
+      if (toastTimeout) {
+        clearTimeout(toastTimeout);
+      }
+      toastTimeout = setTimeout(() => {
         toast.classList.remove("toast--visible");
+        toast.classList.remove("toast--error");
       }, 2500);
+    };
+
+    const handleAction = async (operation, successMessage) => {
+      try {
+        await operation();
+        if (successMessage) {
+          showToast(successMessage);
+        }
+      } catch (error) {
+        console.error("Admin action error", error);
+        const message = error?.message || "Não foi possível concluir a ação.";
+        showToast(message, true);
+      }
     };
 
     const createBulletRow = (value = "") => {
@@ -845,8 +879,7 @@ body {
           if (!confirmation) {
             return;
           }
-          window.SiteData.deleteProduct(product.id);
-          showToast("Produto removido");
+          handleAction(() => window.SiteData.deleteProduct(product.id), "Produto removido");
         });
 
         actions.append(editBtn, deleteBtn);
@@ -858,12 +891,15 @@ body {
     heroForm.addEventListener("submit", (event) => {
       event.preventDefault();
       const bullets = collectBullets();
-      window.SiteData.updateHero({
-        title: heroTitleInput.value.trim(),
-        paragraph: heroParagraphInput.value.trim(),
-        bullets
-      });
-      showToast("Conteúdo atualizado");
+      handleAction(
+        () =>
+          window.SiteData.updateHero({
+            title: heroTitleInput.value.trim(),
+            paragraph: heroParagraphInput.value.trim(),
+            bullets
+          }),
+        "Conteúdo atualizado"
+      );
     });
 
     addBulletBtn.addEventListener("click", () => createBulletRow(""));
@@ -873,8 +909,7 @@ body {
       if (!confirmation) {
         return;
       }
-      window.SiteData.reset();
-      showToast("Conteúdo restaurado");
+      handleAction(() => window.SiteData.reset(), "Conteúdo restaurado");
     });
 
     productForm.addEventListener("submit", (event) => {
@@ -889,21 +924,21 @@ body {
 
       const payload = {
         id: normalizedId,
+        slug: normalizedId,
         title: productTitleInput.value.trim(),
         description: productDescriptionInput.value.trim(),
         price: Number.isFinite(priceValue) ? Number(priceValue.toFixed(2)) : 0,
         image: productImageInput.value.trim() || "1.webp"
       };
 
-      if (editingProductId) {
-        window.SiteData.updateProduct(editingProductId, payload);
-        showToast("Produto atualizado");
-      } else {
-        window.SiteData.createProduct(payload);
-        showToast("Produto cadastrado");
-      }
-
-      resetProductForm();
+      handleAction(async () => {
+        if (editingProductId) {
+          await window.SiteData.updateProduct(editingProductId, payload);
+        } else {
+          await window.SiteData.createProduct(payload);
+        }
+        resetProductForm();
+      }, editingProductId ? "Produto atualizado" : "Produto cadastrado");
     });
 
     clearProductFormBtn.addEventListener("click", resetProductForm);

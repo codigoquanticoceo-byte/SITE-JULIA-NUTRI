@@ -1,11 +1,9 @@
 (function () {
-  const STORAGE_KEY = "juliaSiteData.v1";
-  const clone = (value) => JSON.parse(JSON.stringify(value));
-
   const DEFAULT_DATA = {
     hero: {
       title: "Planilhas e Arquivos Prontos",
-      paragraph: "✔ Manual de Boas Práticas (MBP)\n✔ POPs – Procedimentos Operacionais Padronizados\n✔ Planilhas Profissionais",
+      paragraph:
+        "✔ Manual de Boas Práticas (MBP)\n✔ POPs – Procedimentos Operacionais Padronizados\n✔ Planilhas Profissionais",
       bullets: [
         "Planilhas de controle de estoque",
         "Modelos de relatórios",
@@ -16,235 +14,383 @@
     },
     products: [
       {
-        id: "planilha-estoque",
+        slug: "planilha-estoque",
         title: "Artigo de exemplo nutrição",
-        description: "Esse artigo é destinado para pessoas de tal faixa etária, seguindo esse processo você ganhará tal resultado.",
+        description:
+          "Esse artigo é destinado para pessoas de tal faixa etária, seguindo esse processo você ganhará tal resultado.",
         price: 29,
-        image: "1.webp"
+        image: "1.webp",
+        position: 1
       },
       {
-        id: "planilha-relatorios",
+        slug: "planilha-relatorios",
         title: "Artigo de exemplo nutrição",
-        description: "Esse artigo é destinado para pessoas de tal faixa etária, seguindo esse processo você ganhará tal resultado.",
+        description:
+          "Esse artigo é destinado para pessoas de tal faixa etária, seguindo esse processo você ganhará tal resultado.",
         price: 25,
-        image: "2.webp"
+        image: "2.webp",
+        position: 2
       },
       {
-        id: "planilha-fichas",
+        slug: "planilha-fichas",
         title: "Artigo de exemplo nutrição",
-        description: "Esse artigo é destinado para pessoas de tal faixa etária, seguindo esse processo você ganhará tal resultado.",
+        description:
+          "Esse artigo é destinado para pessoas de tal faixa etária, seguindo esse processo você ganhará tal resultado.",
         price: 25,
-        image: "3.webp"
+        image: "3.webp",
+        position: 3
       },
       {
-        id: "planilha-checklists",
+        slug: "planilha-checklists",
         title: "Artigo de exemplo nutrição",
-        description: "Esse artigo é destinado para pessoas de tal faixa etária, seguindo esse processo você ganhará tal resultado.",
+        description:
+          "Esse artigo é destinado para pessoas de tal faixa etária, seguindo esse processo você ganhará tal resultado.",
         price: 20,
-        image: "4.png"
+        image: "4.png",
+        position: 4
       }
     ]
   };
 
-  let memoryState = clone(DEFAULT_DATA);
+  const clone = (value) => JSON.parse(JSON.stringify(value));
 
-  const normalizeSlug = (text, fallback) => {
-    if (!text) {
-      return fallback;
+  const mapDefaults = () => ({
+    hero: {
+      id: null,
+      title: DEFAULT_DATA.hero.title,
+      paragraph: DEFAULT_DATA.hero.paragraph,
+      bullets: [...DEFAULT_DATA.hero.bullets]
+    },
+    products: DEFAULT_DATA.products.map((product, idx) => ({
+      id: product.slug,
+      dbId: null,
+      slug: product.slug,
+      title: product.title,
+      description: product.description,
+      price: Number(product.price) || 0,
+      image: product.image,
+      position: Number.isFinite(product.position) ? product.position : idx + 1
+    }))
+  });
+
+  let supabase = window.supabaseClient || null;
+  let state = mapDefaults();
+  let readyResolver = null;
+  const readyPromise = new Promise((resolve) => {
+    readyResolver = resolve;
+  });
+
+  const finishReady = () => {
+    if (readyResolver) {
+      readyResolver();
+      readyResolver = null;
     }
-    return text
-      .toString()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "")
-      .trim() || fallback;
   };
 
-  const normalizeProduct = (product, index = 0) => {
-    if (!product || typeof product !== "object") {
-      return null;
-    }
-
-    const title = (product.title || "").trim() || `Produto ${index + 1}`;
-    const slugFallback = `produto-${index + 1}`;
-    const idSource = (product.id || title || slugFallback).trim();
-    const normalizedPrice = Number(product.price);
-
-    return {
-      id: normalizeSlug(idSource, slugFallback),
-      title,
-      description: (product.description || "").trim(),
-      price: Number.isFinite(normalizedPrice) ? Number(normalizedPrice.toFixed(2)) : 0,
-      image: (product.image || "1.webp").trim() || "1.webp"
-    };
-  };
-
-  const ensureArray = (value, fallback) => (Array.isArray(value) ? value : clone(fallback));
-
-  const mergeWithDefaults = (source) => {
-    const merged = clone(DEFAULT_DATA);
-    if (!source || typeof source !== "object") {
-      return merged;
-    }
-
-    merged.hero.title = (source.hero?.title || merged.hero.title).trim();
-    merged.hero.paragraph = (source.hero?.paragraph || merged.hero.paragraph).trim();
-    merged.hero.bullets = ensureArray(source.hero?.bullets, merged.hero.bullets)
-      .map((bullet) => (bullet || "").trim())
-      .filter(Boolean);
-
-    if (Array.isArray(source.products) && source.products.length) {
-      const normalizedProducts = source.products
-        .map((product, idx) => normalizeProduct(product, idx))
-        .filter(Boolean);
-      if (normalizedProducts.length) {
-        merged.products = normalizedProducts;
-      }
-    }
-
-    return merged;
-  };
-
-  const read = () => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) {
-        memoryState = clone(DEFAULT_DATA);
-        return memoryState;
-      }
-      const parsed = JSON.parse(raw);
-      memoryState = mergeWithDefaults(parsed);
-    } catch (error) {
-      console.warn("SiteData: não foi possível ler o armazenamento local.", error);
-    }
-    return memoryState;
-  };
-
-  const dispatchUpdate = (payload) => {
-    const detail = clone(payload);
+  const dispatchUpdate = () => {
+    const detail = clone(state);
     try {
       window.dispatchEvent(new CustomEvent("siteData:updated", { detail }));
-    } catch (_) {
+    } catch (error) {
       const fallbackEvent = document.createEvent("CustomEvent");
       fallbackEvent.initCustomEvent("siteData:updated", false, false, detail);
       window.dispatchEvent(fallbackEvent);
     }
   };
 
-  const commit = (data) => {
-    const snapshot = clone(data);
-    memoryState = snapshot;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
-    } catch (error) {
-      console.warn("SiteData: não foi possível salvar no armazenamento local.", error);
+  const ensureSupabase = () =>
+    new Promise((resolve) => {
+      if (supabase) {
+        resolve(supabase);
+        return;
+      }
+      if (window.supabaseClient) {
+        supabase = window.supabaseClient;
+        resolve(supabase);
+        return;
+      }
+      const timeout = setTimeout(() => {
+        resolve(null);
+      }, 4000);
+
+      const handler = (event) => {
+        clearTimeout(timeout);
+        supabase = window.supabaseClient || event.detail?.supabase || null;
+        window.removeEventListener("supabase:ready", handler);
+        resolve(supabase);
+      };
+
+      window.addEventListener("supabase:ready", handler, { once: true });
+    });
+
+  const requireSupabase = async () => {
+    const client = await ensureSupabase();
+    if (!client) {
+      throw new Error("Supabase não configurado no navegador.");
     }
-    if (typeof window !== "undefined") {
-      dispatchUpdate(snapshot);
-    }
-    return snapshot;
+    return client;
   };
 
-  const updateHero = (payload = {}) => {
-    const data = read();
-    const bulletSource = Array.isArray(payload.bullets)
-      ? payload.bullets
-      : data.hero.bullets;
-    const sanitizedBullets = bulletSource
+  const sanitizeBullets = (bullets, fallback) => {
+    const source = Array.isArray(bullets) ? bullets : fallback;
+    return (source || [])
       .map((bullet) => (bullet || "").trim())
       .filter(Boolean);
+  };
 
-    const titleInput = (payload.title ?? data.hero.title ?? DEFAULT_DATA.hero.title)
-      .toString()
-      .trim();
-    const paragraphInput =
-      typeof payload.paragraph === "string"
-        ? payload.paragraph
-        : data.hero.paragraph ?? "";
+  const mapHeroRecord = (record) => ({
+    id: record?.id || null,
+    title: (record?.title || DEFAULT_DATA.hero.title).trim(),
+    paragraph: (record?.paragraph || DEFAULT_DATA.hero.paragraph || "").trim(),
+    bullets: sanitizeBullets(record?.bullets, DEFAULT_DATA.hero.bullets)
+  });
 
-    const nextHero = {
-      ...data.hero,
-      ...payload,
-      title: titleInput || DEFAULT_DATA.hero.title,
-      paragraph: paragraphInput.trim(),
+  const normalizeSlug = (text, fallback) => {
+    if (!text) {
+      return fallback;
+    }
+    return (
+      text
+        .toString()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "")
+        .trim() || fallback
+    );
+  };
+
+  const mapProductRecord = (record, index = 0) => ({
+    id: record?.slug || record?.id || `produto-${index + 1}`,
+    dbId: record?.id || null,
+    slug: record?.slug || record?.id || `produto-${index + 1}`,
+    title: (record?.title || `Produto ${index + 1}`).trim(),
+    description: (record?.description || "").trim(),
+    price: Number(record?.price) || 0,
+    image: (record?.image || "1.webp").trim() || "1.webp",
+    position: Number.isFinite(record?.position) ? Number(record.position) : index + 1
+  });
+
+  const normalizeProductInput = (product, index = 0) => {
+    const slugFallback = `produto-${index + 1}`;
+    const title = (product.title || `Produto ${index + 1}`).trim();
+    const slug = normalizeSlug(product.slug || product.id || title, slugFallback);
+    const price = Number(product.price);
+
+    return {
+      slug,
+      title,
+      description: (product.description || "").trim(),
+      price: Number.isFinite(price) ? Number(price.toFixed(2)) : 0,
+      image: (product.image || "1.webp").trim() || "1.webp",
+      position: Number.isFinite(product.position)
+        ? Number(product.position)
+        : index + 1
+    };
+  };
+
+  const getNextPosition = () =>
+    state.products.reduce((current, product) => {
+      return Math.max(current, Number(product.position) || 0);
+    }, 0) + 1;
+
+  const refresh = async () => {
+    const client = await ensureSupabase();
+    if (!client) {
+      state = mapDefaults();
+      dispatchUpdate();
+      finishReady();
+      return clone(state);
+    }
+
+    try {
+      const heroPromise = client
+        .from("hero_content")
+        .select("*")
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const productsPromise = client
+        .from("products")
+        .select("*")
+        .order("position", { ascending: true })
+        .order("created_at", { ascending: true });
+
+      const [{ data: heroData, error: heroError }, { data: productData, error: productError }] =
+        await Promise.all([heroPromise, productsPromise]);
+
+      if (heroError) {
+        throw heroError;
+      }
+      if (productError) {
+        throw productError;
+      }
+
+      const hero = heroData ? mapHeroRecord(heroData) : mapDefaults().hero;
+      const products = Array.isArray(productData) && productData.length
+        ? productData.map((record, idx) => mapProductRecord(record, idx))
+        : mapDefaults().products;
+
+      state = { hero, products };
+    } catch (error) {
+      console.warn("SiteData: não foi possível ler o conteúdo remoto, usando padrão.", error);
+      state = mapDefaults();
+    }
+
+    dispatchUpdate();
+    finishReady();
+    return clone(state);
+  };
+
+  const updateHero = async (payload = {}) => {
+    const client = await requireSupabase();
+    const currentHero = state.hero || mapDefaults().hero;
+    const sanitizedBullets = sanitizeBullets(payload.bullets, currentHero.bullets);
+
+    const record = {
+      id: currentHero.id || undefined,
+      title: (payload.title ?? currentHero.title ?? DEFAULT_DATA.hero.title)
+        .toString()
+        .trim() || DEFAULT_DATA.hero.title,
+      paragraph: (payload.paragraph ?? currentHero.paragraph ?? "").toString().trim(),
       bullets: sanitizedBullets
     };
 
-    return commit({
-      ...data,
-      hero: nextHero
-    });
+    const { error } = await client
+      .from("hero_content")
+      .upsert(record, { onConflict: "id" })
+      .select("id")
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    await refresh();
+    return clone(state);
   };
 
-  const createProduct = (product) => {
-    const data = read();
-    const normalized = normalizeProduct(product, data.products.length);
-    const nextProducts = [...data.products, normalized];
-    return commit({
-      ...data,
-      products: nextProducts
-    });
-  };
-
-  const updateProduct = (productId, payload = {}) => {
-    if (!productId) {
-      return read();
-    }
-    const data = read();
-    const index = data.products.findIndex((product) => product.id === productId);
-    if (index === -1) {
-      return data;
-    }
-    const merged = {
-      ...data.products[index],
-      ...payload
+  const createProduct = async (product) => {
+    const client = await requireSupabase();
+    const normalized = normalizeProductInput(product, state.products.length);
+    const record = {
+      slug: normalized.slug,
+      title: normalized.title,
+      description: normalized.description,
+      price: normalized.price,
+      image: normalized.image,
+      position: normalized.position || getNextPosition()
     };
-    const normalized = normalizeProduct(merged, index);
-    const nextProducts = [...data.products];
-    nextProducts[index] = normalized;
-    return commit({
-      ...data,
-      products: nextProducts
-    });
+
+    const { error } = await client.from("products").insert(record);
+    if (error) {
+      throw error;
+    }
+
+    await refresh();
+    return clone(state);
   };
 
-  const deleteProduct = (productId) => {
+  const findProductById = (productId) =>
+    state.products.find(
+      (product) => product.id === productId || product.dbId === productId
+    );
+
+  const updateProduct = async (productId, payload = {}) => {
     if (!productId) {
-      return read();
+      throw new Error("Produto inválido.");
     }
-    const data = read();
-    const nextProducts = data.products.filter((product) => product.id !== productId);
-    return commit({
-      ...data,
-      products: nextProducts
+
+    const client = await requireSupabase();
+    const current = findProductById(productId);
+    if (!current || !current.dbId) {
+      throw new Error("Produto não encontrado.");
+    }
+
+    const index = state.products.findIndex((product) => product.id === current.id);
+    const normalized = normalizeProductInput({ ...current, ...payload }, index);
+
+    const { error } = await client
+      .from("products")
+      .update({
+        slug: normalized.slug,
+        title: normalized.title,
+        description: normalized.description,
+        price: normalized.price,
+        image: normalized.image,
+        position: normalized.position
+      })
+      .eq("id", current.dbId);
+
+    if (error) {
+      throw error;
+    }
+
+    await refresh();
+    return clone(state);
+  };
+
+  const deleteProduct = async (productId) => {
+    if (!productId) {
+      throw new Error("Produto inválido.");
+    }
+
+    const client = await requireSupabase();
+    const current = findProductById(productId);
+    if (!current || !current.dbId) {
+      throw new Error("Produto não encontrado.");
+    }
+
+    const { error } = await client.from("products").delete().eq("id", current.dbId);
+    if (error) {
+      throw error;
+    }
+
+    await refresh();
+    return clone(state);
+  };
+
+  const reset = async () => {
+    const client = await requireSupabase();
+    await client.from("hero_content").delete().neq("id", null);
+    await client.from("products").delete().neq("id", null);
+
+    await client.from("hero_content").insert({
+      title: DEFAULT_DATA.hero.title,
+      paragraph: DEFAULT_DATA.hero.paragraph,
+      bullets: DEFAULT_DATA.hero.bullets
     });
-  };
 
-  const overwriteAll = (payload) => {
-    const merged = mergeWithDefaults(payload);
-    return commit(merged);
-  };
+    const defaultProducts = DEFAULT_DATA.products.map((product, idx) => ({
+      slug: product.slug,
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      image: product.image,
+      position: product.position || idx + 1
+    }));
 
-  const reset = () => {
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch (error) {
-      console.warn("SiteData: não foi possível limpar o armazenamento local.", error);
+    if (defaultProducts.length) {
+      await client.from("products").insert(defaultProducts);
     }
-    return commit(clone(DEFAULT_DATA));
+
+    await refresh();
+    return clone(state);
   };
 
   window.SiteData = {
-    STORAGE_KEY,
-    get: () => clone(read()),
-    getDefaults: () => clone(DEFAULT_DATA),
+    get: () => clone(state),
+    getDefaults: () => clone(mapDefaults()),
+    ready: () => readyPromise,
+    refresh,
     updateHero,
     createProduct,
     updateProduct,
     deleteProduct,
-    overwriteAll,
     reset
   };
+
+  refresh();
 })();

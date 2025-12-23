@@ -405,18 +405,13 @@ body {
     </p>
 </div>
 
-<script src="/assets/js/cart.js"></script>
-<script src="/assets/js/visit-counter.js"></script>
+<script src="./assets/js/cart.js"></script>
+<script src="./assets/js/visit-counter.js"></script>
+<script src="./assets/js/auth.js"></script>
 <script>
 document.getElementById("cartBtn").addEventListener("click", function () {
     window.location.href = "carrinho.html";
 });
-
-const usuarioLogado = "admin";
-const adminBtn = document.getElementById("adminBtn");
-if (adminBtn && usuarioLogado === "admin") {
-    adminBtn.style.display = "flex";
-}
 </script>
 </body>
 </html>

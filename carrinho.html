@@ -506,8 +506,9 @@ body {
   </div>
 </div>
 
-<script src="/assets/js/cart.js"></script>
-<script src="/assets/js/visit-counter.js"></script>
+<script src="./assets/js/cart.js"></script>
+<script src="./assets/js/visit-counter.js"></script>
+<script src="./assets/js/auth.js"></script>
 <script>
 function formatBRL(value) {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -625,12 +626,6 @@ document.getElementById("checkoutBtn").addEventListener("click", () => {
 document.getElementById("cartBtn").addEventListener("click", () => {
   window.location.href = "carrinho.html";
 });
-
-const usuarioLogado = "admin";
-const adminBtn = document.getElementById("adminBtn");
-if (adminBtn && usuarioLogado === "admin") {
-  adminBtn.style.display = "flex";
-}
 
 render();
 </script>
