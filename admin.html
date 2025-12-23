@@ -179,6 +179,272 @@ body {
   color: rgba(255,255,255,0.9);
 }
 
+.admin-wrapper {
+  width: min(1100px, 92%);
+  margin: 40px auto 80px;
+  display: grid;
+  gap: 32px;
+}
+
+.panel {
+  background-color: var(--preto);
+  color: var(--branco);
+  border-radius: 28px;
+  padding: 32px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.panel__title {
+  margin: 0;
+  font-size: 26px;
+  color: var(--laranja);
+}
+
+.panel__subtitle {
+  margin: 6px 0 0;
+  color: rgba(255,255,255,0.8);
+  font-size: 15px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+
+.form-grid input,
+.form-grid textarea,
+.bullet-row input {
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background-color: #2a2a2a;
+  color: var(--branco);
+  padding: 12px 14px;
+  font-size: 15px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-grid input:focus,
+.form-grid textarea:focus,
+.bullet-row input:focus {
+  outline: none;
+  border-color: var(--laranja);
+  box-shadow: 0 0 0 2px rgba(242, 140, 40, 0.25);
+}
+
+.form-grid small {
+  color: rgba(255,255,255,0.6);
+}
+
+.bullet-list-header {
+  margin-top: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.bullet-list {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bullet-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.icon-button {
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  background-color: rgba(255,255,255,0.12);
+  color: var(--branco);
+  font-size: 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.icon-button:hover {
+  background-color: var(--vinho);
+}
+
+.button-row,
+.form-actions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.primary-button,
+.ghost-button,
+.danger-button {
+  border-radius: 999px;
+  padding: 10px 26px;
+  font-weight: bold;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.primary-button {
+  background-color: var(--laranja);
+  color: var(--preto);
+}
+
+.primary-button:hover {
+  background-color: var(--vinho);
+  color: var(--branco);
+}
+
+.ghost-button {
+  background-color: transparent;
+  color: var(--branco);
+  border-color: rgba(255,255,255,0.25);
+}
+
+.ghost-button:hover {
+  border-color: var(--laranja);
+  color: var(--laranja);
+}
+
+.danger-button {
+  background-color: rgba(224, 0, 108, 0.15);
+  color: var(--vinho);
+  border-color: transparent;
+}
+
+.danger-button:hover {
+  background-color: var(--vinho);
+  color: var(--branco);
+}
+
+.product-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.product-card {
+  display: flex;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 20px;
+  background-color: #2a2a2a;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.product-card img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 2px solid rgba(255,255,255,0.1);
+}
+
+.product-card__body {
+  flex: 1;
+  min-width: 200px;
+}
+
+.product-card__title {
+  margin: 0;
+  font-size: 18px;
+}
+
+.product-card__meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.75);
+}
+
+.product-card__price {
+  font-weight: bold;
+  color: var(--laranja);
+  font-size: 18px;
+}
+
+.product-card__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.product-list__empty {
+  text-align: center;
+  padding: 28px;
+  border-radius: 18px;
+  border: 2px dashed rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.8);
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background-color: var(--preto);
+  color: var(--branco);
+  padding: 16px 22px;
+  border-radius: 18px;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.35);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.toast--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .panel {
+    padding: 24px;
+  }
+
+  .panel__title {
+    font-size: 22px;
+  }
+
+  .product-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .product-card img {
+    width: 100%;
+    height: 180px;
+  }
+}
+
 /* CONTADOR DE VISITAS */
 .visit-counter-strip {
     width: 100%;
@@ -298,18 +564,86 @@ body {
     </nav>
   </div>
 
-  <section class="card">
-    <h1>Painel Administrativo</h1>
-    <p>
-      Área reservada para configuração de produtos, pedidos e usuários.
-      O conteúdo definitivo ainda está em construção.
-    </p>
+  <section class="admin-wrapper">
+    <article class="panel">
+      <header class="panel__header">
+        <div>
+          <h1 class="panel__title">Conteúdo principal</h1>
+          <p class="panel__subtitle">Atualize o título, o texto e os destaques exibidos na página inicial.</p>
+        </div>
+        <button type="button" class="ghost-button" id="resetDataBtn">Restaurar padrão</button>
+      </header>
+      <form id="heroForm">
+        <div class="form-grid">
+          <label>
+            Título
+            <input type="text" id="heroTitleInput" required maxlength="120" placeholder="Planilhas e Arquivos Prontos">
+          </label>
+          <label>
+            Texto introdutório
+            <textarea id="heroParagraphInput" placeholder="✔ Manual de Boas Práticas..."></textarea>
+            <small>Você pode quebrar linhas com Enter.</small>
+          </label>
+        </div>
+        <div class="bullet-list-header">
+          <span>Lista de destaques</span>
+          <button type="button" class="ghost-button" id="addBulletBtn">Adicionar item</button>
+        </div>
+        <div class="bullet-list" id="bulletContainer"></div>
+        <div class="form-actions">
+          <button type="submit" class="primary-button">Salvar conteúdo</button>
+        </div>
+      </form>
+    </article>
+
+    <article class="panel">
+      <header class="panel__header">
+        <div>
+          <h2 class="panel__title">Produtos</h2>
+          <p class="panel__subtitle">Cadastre, edite ou remova itens exibidos na vitrine.</p>
+        </div>
+        <button type="button" class="ghost-button" id="clearProductFormBtn">Novo produto</button>
+      </header>
+      <form id="productForm">
+        <div class="form-grid">
+          <label>
+            ID (opcional)
+            <input type="text" id="productIdInput" placeholder="planilha-estoque">
+            <small>Deixe em branco para gerar automaticamente.</small>
+          </label>
+          <label>
+            Nome do produto
+            <input type="text" id="productTitleInput" required placeholder="Artigo de exemplo">
+          </label>
+          <label>
+            Preço (R$)
+            <input type="text" id="productPriceInput" required placeholder="29,90">
+          </label>
+          <label>
+            URL da imagem
+            <input type="text" id="productImageInput" placeholder="1.webp">
+          </label>
+          <label style="grid-column: 1 / -1;">
+            Descrição
+            <textarea id="productDescriptionInput" rows="4" placeholder="Esse artigo é destinado..." required></textarea>
+          </label>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="primary-button" id="productSubmitBtn">Salvar produto</button>
+        </div>
+      </form>
+
+      <div class="product-list" id="productList"></div>
+    </article>
+
     <div class="actions">
       <a href="index.html">Voltar ao site</a>
     </div>
   </section>
-  <script src="/assets/js/cart.js"></script>
-<script src="/assets/js/visit-counter.js"></script>
+  <div class="toast" id="adminToast" role="status" aria-live="polite"></div>
+  <script src="./assets/js/site-data.js"></script>
+  <script src="./assets/js/cart.js"></script>
+  <script src="./assets/js/visit-counter.js"></script>
   <script>
   document.getElementById("cartBtn").addEventListener("click", function () {
     window.location.href = "carrinho.html";
@@ -320,6 +654,268 @@ body {
   if (adminBtn && usuarioLogado === "admin") {
     adminBtn.style.display = "flex";
   }
+
+  (function () {
+    if (!window.SiteData) {
+      console.warn("SiteData não foi carregado.");
+      return;
+    }
+
+    const heroForm = document.getElementById("heroForm");
+    const heroTitleInput = document.getElementById("heroTitleInput");
+    const heroParagraphInput = document.getElementById("heroParagraphInput");
+    const bulletContainer = document.getElementById("bulletContainer");
+    const addBulletBtn = document.getElementById("addBulletBtn");
+    const resetDataBtn = document.getElementById("resetDataBtn");
+
+    const productForm = document.getElementById("productForm");
+    const productList = document.getElementById("productList");
+    const productIdInput = document.getElementById("productIdInput");
+    const productTitleInput = document.getElementById("productTitleInput");
+    const productDescriptionInput = document.getElementById("productDescriptionInput");
+    const productPriceInput = document.getElementById("productPriceInput");
+    const productImageInput = document.getElementById("productImageInput");
+    const productSubmitBtn = document.getElementById("productSubmitBtn");
+    const clearProductFormBtn = document.getElementById("clearProductFormBtn");
+
+    const toast = document.getElementById("adminToast");
+
+    let editingProductId = null;
+
+    const slugify = (text, fallback) => {
+      const base = (text || "").toString().trim();
+      if (!base) {
+        return fallback;
+      }
+      return base
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "") || fallback;
+    };
+
+    const formatCurrency = (value) => {
+      const numeric = Number(value) || 0;
+      return numeric.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    };
+
+    const showToast = (message) => {
+      if (!toast) {
+        return;
+      }
+      toast.textContent = message;
+      toast.classList.add("toast--visible");
+      setTimeout(() => {
+        toast.classList.remove("toast--visible");
+      }, 2500);
+    };
+
+    const createBulletRow = (value = "") => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "bullet-row";
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "hero-bullet-input";
+      input.placeholder = "Ex.: Checklists de rotina";
+      input.value = value;
+
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.className = "icon-button";
+      removeBtn.setAttribute("aria-label", "Remover item");
+      removeBtn.innerHTML = "&times;";
+      removeBtn.addEventListener("click", () => {
+        if (bulletContainer.children.length === 1) {
+          input.value = "";
+          return;
+        }
+        wrapper.remove();
+      });
+
+      wrapper.append(input, removeBtn);
+      bulletContainer.appendChild(wrapper);
+    };
+
+    const collectBullets = () =>
+      Array.from(bulletContainer.querySelectorAll("input"))
+        .map((input) => input.value.trim())
+        .filter(Boolean);
+
+    const loadHeroData = () => {
+      const data = window.SiteData.get();
+      heroTitleInput.value = data.hero.title;
+      heroParagraphInput.value = data.hero.paragraph;
+      bulletContainer.innerHTML = "";
+      const bullets = data.hero.bullets.length ? data.hero.bullets : [""];
+      bullets.forEach((bullet) => createBulletRow(bullet));
+    };
+
+    const ensureUniqueId = (candidateId, list, ignoreId = null) => {
+      let baseId = candidateId;
+      let suffix = 2;
+      const exists = (id) =>
+        list.some((product) => product.id === id && product.id !== ignoreId);
+      while (exists(baseId)) {
+        baseId = `${candidateId}-${suffix}`;
+        suffix += 1;
+      }
+      return baseId;
+    };
+
+    const resetProductForm = () => {
+      editingProductId = null;
+      productForm.reset();
+      productSubmitBtn.textContent = "Salvar produto";
+    };
+
+    const fillProductForm = (product) => {
+      editingProductId = product.id;
+      productIdInput.value = product.id;
+      productTitleInput.value = product.title;
+      productDescriptionInput.value = product.description;
+      const priceString = Number(product.price || 0)
+        .toFixed(2)
+        .replace(".", ",");
+      productPriceInput.value = priceString;
+      productImageInput.value = product.image;
+      productSubmitBtn.textContent = "Atualizar produto";
+      window.scrollTo({ top: heroForm.offsetTop, behavior: "smooth" });
+    };
+
+    const renderProductList = () => {
+      const { products } = window.SiteData.get();
+      productList.innerHTML = "";
+
+      if (!products.length) {
+        const empty = document.createElement("div");
+        empty.className = "product-list__empty";
+        empty.textContent = "Nenhum produto cadastrado até o momento.";
+        productList.appendChild(empty);
+        return;
+      }
+
+      products.forEach((product) => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+
+        const image = document.createElement("img");
+        image.src = product.image;
+        image.alt = product.title;
+
+        const body = document.createElement("div");
+        body.className = "product-card__body";
+
+        const title = document.createElement("h3");
+        title.className = "product-card__title";
+        title.textContent = product.title;
+
+        const description = document.createElement("p");
+        description.textContent = product.description;
+
+        const meta = document.createElement("div");
+        meta.className = "product-card__meta";
+
+        const idTag = document.createElement("span");
+        idTag.textContent = `ID: ${product.id}`;
+
+        const priceTag = document.createElement("span");
+        priceTag.className = "product-card__price";
+        priceTag.textContent = formatCurrency(product.price);
+
+        meta.append(idTag, priceTag);
+        body.append(title, description, meta);
+
+        const actions = document.createElement("div");
+        actions.className = "product-card__actions";
+
+        const editBtn = document.createElement("button");
+        editBtn.type = "button";
+        editBtn.className = "ghost-button";
+        editBtn.textContent = "Editar";
+        editBtn.addEventListener("click", () => fillProductForm(product));
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.className = "danger-button";
+        deleteBtn.textContent = "Excluir";
+        deleteBtn.addEventListener("click", () => {
+          const confirmation = confirm(`Deseja realmente excluir "${product.title}"?`);
+          if (!confirmation) {
+            return;
+          }
+          window.SiteData.deleteProduct(product.id);
+          showToast("Produto removido");
+        });
+
+        actions.append(editBtn, deleteBtn);
+        card.append(image, body, actions);
+        productList.appendChild(card);
+      });
+    };
+
+    heroForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const bullets = collectBullets();
+      window.SiteData.updateHero({
+        title: heroTitleInput.value.trim(),
+        paragraph: heroParagraphInput.value.trim(),
+        bullets
+      });
+      showToast("Conteúdo atualizado");
+    });
+
+    addBulletBtn.addEventListener("click", () => createBulletRow(""));
+
+    resetDataBtn.addEventListener("click", () => {
+      const confirmation = confirm("Deseja restaurar todo o conteúdo para o padrão?");
+      if (!confirmation) {
+        return;
+      }
+      window.SiteData.reset();
+      showToast("Conteúdo restaurado");
+    });
+
+    productForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const currentData = window.SiteData.get();
+      const desiredId = slugify(
+        productIdInput.value,
+        slugify(productTitleInput.value, `produto-${Date.now()}`)
+      );
+      const normalizedId = ensureUniqueId(desiredId, currentData.products, editingProductId);
+      const priceValue = parseFloat(productPriceInput.value.replace(",", "."));
+
+      const payload = {
+        id: normalizedId,
+        title: productTitleInput.value.trim(),
+        description: productDescriptionInput.value.trim(),
+        price: Number.isFinite(priceValue) ? Number(priceValue.toFixed(2)) : 0,
+        image: productImageInput.value.trim() || "1.webp"
+      };
+
+      if (editingProductId) {
+        window.SiteData.updateProduct(editingProductId, payload);
+        showToast("Produto atualizado");
+      } else {
+        window.SiteData.createProduct(payload);
+        showToast("Produto cadastrado");
+      }
+
+      resetProductForm();
+    });
+
+    clearProductFormBtn.addEventListener("click", resetProductForm);
+
+    window.addEventListener("siteData:updated", () => {
+      loadHeroData();
+      renderProductList();
+    });
+
+    loadHeroData();
+    renderProductList();
+  })();
   </script>
 </body>
 </html>

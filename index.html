@@ -266,12 +266,36 @@ body {
     line-height: 1.5;
 }
 
+.hero-list {
+    font-size: 18px;
+    line-height: 1.5;
+    margin-top: 18px;
+    padding-left: 24px;
+}
+
+.hero-list li {
+    margin-bottom: 6px;
+}
+
 /* GRID DE PRODUTOS (ORIGINAL) */
 .produtos {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 30px;
     margin-top: 40px;
+}
+
+.produtos.empty {
+    display: block;
+}
+
+.product-empty {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 18px;
+    padding: 40px 20px;
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
 }
 
 .produto {
@@ -370,74 +394,19 @@ body {
     </div>
 </div>
 
-<div class="quadro">
-    <h2>Planilhas e Arquivos Prontos</h2>
+<div class="quadro" id="heroSection">
+    <h2 id="heroTitle"></h2>
 
-    <p>
-        ✔ Manual de Boas Práticas (MBP)<br>
-        ✔ POPs – Procedimentos Operacionais Padronizados<br>
-        ✔ Planilhas Profissionais
-    </p>
+    <p id="heroParagraph"></p>
 
-    <ul>
-        <li>Planilhas de controle de estoque</li>
-        <li>Modelos de relatórios</li>
-        <li>Fichas técnicas</li>
-        <li>Checklists de rotina</li>
-        <li>Documentos administrativos</li>
-    </ul>
+    <ul class="hero-list" id="heroList"></ul>
 
-    <div class="produtos">
-
-        <div class="produto">
-            <img src="1.webp" alt="Planilha de estoque">
-            <h3>Artigo de exemplo nutrição</h3>
-            <p>
-                Esse artigo é destinado para pessoas de tal faixa etária,
-                seguindo esse processo você ganhará tal resultado.
-            </p>
-            <div class="preco">R$ 29,00</div>
-            <button type="button" class="botao-compra" onclick="addToCart({id:'planilha-estoque', title:'Artigo de exemplo nutrição', price:29, image:'1.webp'})">Comprar agora</button>
-        </div>
-
-        <div class="produto">
-            <img src="2.webp" alt="Planilha de relatórios">
-            <h3>Artigo de exemplo nutrição</h3>
-            <p>
-                Esse artigo é destinado para pessoas de tal faixa etária,
-                seguindo esse processo você ganhará tal resultado.
-            </p>
-            <div class="preco">R$ 25,00</div>
-            <button type="button" class="botao-compra" onclick="addToCart({id:'planilha-relatorios', title:'Artigo de exemplo nutrição', price:25, image:'2.webp'})">Comprar agora</button>
-        </div>
-
-        <div class="produto">
-            <img src="3.webp" alt="Planilha de fichas técnicas">
-            <h3>Artigo de exemplo nutrição</h3>
-            <p>
-                Esse artigo é destinado para pessoas de tal faixa etária,
-                seguindo esse processo você ganhará tal resultado.
-            </p>
-            <div class="preco">R$ 25,00</div>
-            <button type="button" class="botao-compra" onclick="addToCart({id:'planilha-fichas', title:'Artigo de exemplo nutrição', price:25, image:'3.webp'})">Comprar agora</button>
-        </div>
-
-        <div class="produto">
-            <img src="4.png" alt="Planilha de checklists">
-            <h3>Artigo de exemplo nutrição</h3>
-            <p>
-                Esse artigo é destinado para pessoas de tal faixa etária,
-                seguindo esse processo você ganhará tal resultado.
-            </p>
-            <div class="preco">R$ 20,00</div>
-            <button type="button" class="botao-compra" onclick="addToCart({id:'planilha-checklists', title:'Artigo de exemplo nutrição', price:20, image:'4.png'})">Comprar agora</button>
-        </div>
-
-    </div>
+    <div class="produtos" id="productGrid" aria-live="polite"></div>
 </div>
 
-<script src="/assets/js/cart.js"></script>
-<script src="/assets/js/visit-counter.js"></script>
+<script src="./assets/js/site-data.js"></script>
+<script src="./assets/js/cart.js"></script>
+<script src="./assets/js/visit-counter.js"></script>
 <script>
 document.getElementById("cartBtn").addEventListener("click", () => {
     window.location.href = "carrinho.html";
@@ -449,6 +418,94 @@ const adminBtn = document.getElementById("adminBtn");
 if (usuarioLogado === "admin") {
     adminBtn.style.display = "flex";
 }
+
+(function () {
+    const heroTitleEl = document.getElementById("heroTitle");
+    const heroParagraphEl = document.getElementById("heroParagraph");
+    const heroListEl = document.getElementById("heroList");
+    const productGridEl = document.getElementById("productGrid");
+
+    const formatCurrency = (value) => {
+        const numeric = Number(value) || 0;
+        return numeric.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+        });
+    };
+
+    const renderProducts = (products) => {
+        if (!productGridEl) {
+            return;
+        }
+        productGridEl.innerHTML = "";
+        productGridEl.classList.toggle("empty", !products.length);
+
+        if (!products.length) {
+            const placeholder = document.createElement("div");
+            placeholder.className = "product-empty";
+            placeholder.textContent = "Nenhum produto disponível no momento.";
+            productGridEl.appendChild(placeholder);
+            return;
+        }
+
+        products.forEach((product) => {
+            const card = document.createElement("div");
+            card.className = "produto";
+
+            const image = document.createElement("img");
+            image.src = product.image;
+            image.alt = product.title;
+
+            const title = document.createElement("h3");
+            title.textContent = product.title;
+
+            const description = document.createElement("p");
+            description.textContent = product.description || "";
+
+            const price = document.createElement("div");
+            price.className = "preco";
+            price.textContent = formatCurrency(product.price);
+
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "botao-compra";
+            button.textContent = "Comprar agora";
+            button.addEventListener("click", () => {
+                window.addToCart?.(product);
+            });
+
+            card.append(image, title, description, price, button);
+            productGridEl.appendChild(card);
+        });
+    };
+
+    const renderHero = () => {
+        if (!window.SiteData) {
+            return;
+        }
+        const data = window.SiteData.get();
+        if (heroTitleEl) {
+            heroTitleEl.textContent = data.hero.title;
+        }
+        if (heroParagraphEl) {
+            heroParagraphEl.innerHTML = (data.hero.paragraph || "").replace(/\n/g, "<br>");
+            heroParagraphEl.hidden = !data.hero.paragraph;
+        }
+        if (heroListEl) {
+            heroListEl.innerHTML = "";
+            data.hero.bullets.forEach((bullet) => {
+                const item = document.createElement("li");
+                item.textContent = bullet;
+                heroListEl.appendChild(item);
+            });
+            heroListEl.hidden = data.hero.bullets.length === 0;
+        }
+        renderProducts(data.products);
+    };
+
+    document.addEventListener("DOMContentLoaded", renderHero);
+    window.addEventListener("siteData:updated", renderHero);
+})();
 </script>
 
 </body>
